@@ -24,8 +24,9 @@ from comparador import (
 )
 
 CARTEIRAS_FOLDER = "Carteiras Oikos/"
-_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FUNDS_PARQUET = os.path.join(_BASE_DIR, "fundos_inf_diario.parquet")
+FUNDS_PARQUET = (
+    "/Users/thiagocosta/Documents/Python Scripts/Otimizador Geral/fundos_inf_diario.parquet"
+)
 
 MESES_PT = {
     "janeiro": 1, "fevereiro": 2, "março": 3, "abril": 4,
@@ -103,9 +104,7 @@ def _load_portfolio_file(path):
 
 @st.cache_resource(show_spinner="Carregando dados de fundos…")
 def _load_funds_parquet():
-    """Carrega o parquet de cotas de fundos. Retorna DataFrame vazio se não encontrado."""
-    if not os.path.exists(FUNDS_PARQUET):
-        return pd.DataFrame(columns=["CNPJ", "VL_QUOTA"])
+    """Carrega o parquet de cotas de fundos gerado pelo funds_loader do Otimizador Geral."""
     df = pd.read_parquet(FUNDS_PARQUET)
     if df.index.name != "Date":
         df = df.rename_axis("Date")
@@ -156,20 +155,17 @@ def _get_fund_returns(cnpj, start, end):
 
     # ── 1. Parquet (rápido, histórico) ───────────────────────────────────
     info = _load_funds_parquet()
-    if not info.empty and not info.index.empty:
-        parquet_end = info.index.max()
-        if start_ts <= parquet_end:
-            sub = info.loc[
-                (info.index >= start_ts) & (info.index <= min(end_ts, parquet_end))
-                & (info["CNPJ"] == clean), "VL_QUOTA"
-            ].dropna()
-            if not sub.empty:
-                frames.append(sub.groupby(level=0).median().sort_index())
-        cvm_from = max(start_ts, parquet_end + pd.Timedelta(days=1))
-    else:
-        cvm_from = start_ts
+    parquet_end = info.index.max()
+    if start_ts <= parquet_end:
+        sub = info.loc[
+            (info.index >= start_ts) & (info.index <= min(end_ts, parquet_end))
+            & (info["CNPJ"] == clean), "VL_QUOTA"
+        ].dropna()
+        if not sub.empty:
+            frames.append(sub.groupby(level=0).median().sort_index())
 
-    # ── 2. CVM download para meses não cobertos pelo parquet ─────────────
+    # ── 2. CVM download para meses após o parquet ─────────────────────────
+    cvm_from = max(start_ts, parquet_end + pd.Timedelta(days=1))
     if cvm_from <= end_ts:
         for m in pd.period_range(start=cvm_from, end=end_ts, freq="M"):
             try:

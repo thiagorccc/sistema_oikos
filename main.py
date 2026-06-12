@@ -4,7 +4,7 @@ from PIL import Image
 from Optimizer import show_optimizer
 from morningcall import show_morningcall
 from comparador import show_comparador
-from carteiras_oikos import show_carteiras
+# from carteiras_oikos import show_carteiras
 import streamlit.components.v1 as components
 
 # Configurações da página
@@ -48,8 +48,8 @@ st.markdown(page_bg_image, unsafe_allow_html=True)
 with st.sidebar:
     selected = option_menu(
         menu_title= None,
-        options=["Home", "Otimizador de Portfólio", "Comparador", "Carteiras Oikos", "Gerador de Relatório"],
-        icons=["house", "bar-chart", "bar-chart", "briefcase", "file-earmark-ppt"],
+        options=["Home", "Otimizador de Portfólio", "Comparador", "Gerador de Relatório"],
+        icons=["house", "bar-chart", "bar-chart", "file-earmark-ppt"],
         menu_icon="sunrise",
         default_index=0,
     )
@@ -66,8 +66,8 @@ elif selected == "Otimizador de Portfólio":
 elif selected == "Comparador":
     show_comparador()
 
-elif selected == "Carteiras Oikos":
-    show_carteiras()
+# elif selected == "Carteiras Oikos":
+#     show_carteiras()
 
 elif selected == "Gerador de Relatório":
     show_morningcall()
