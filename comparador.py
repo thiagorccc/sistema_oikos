@@ -346,10 +346,11 @@ def _portfolio_editor(default_symbols, default_weights, ticker_options, ticker_l
     editor_key   = f"{key_prefix}_editor"
     snapshot_key = f"{key_prefix}_snapshot"
 
-    # When the editor was not rendered in the previous run (e.g., user navigated to
-    # results then clicked "Voltar"), Streamlit removes the editor key from session
-    # state. In that case, restore from the snapshot saved on the last setup render.
-    if editor_key not in st.session_state and snapshot_key in st.session_state:
+    # Use snapshot whenever available — covers both the "Voltar" case (editor_key
+    # removed from session state) and reruns triggered by synthetic asset creation
+    # (where column_config changes can cause data_editor to re-initialize from
+    # default_data instead of session state, resetting user edits to defaults).
+    if snapshot_key in st.session_state:
         default_data = st.session_state[snapshot_key].copy()
     else:
         default_data = pd.DataFrame({
