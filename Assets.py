@@ -124,6 +124,9 @@ symbol_real = {
             "ALUP11.SA": "Alupar Units", 
             "DIRR3.SA": "Direcional ON",
             "CMIG4.SA": "Cemig PN",
+            "AXIA3.SA": "Axia Energia ON",
+            "CPLE3.SA": "Copel ON",
+            "MBRF3.SA": "MBRF Global Foods Company ON",
 
             # Câmbio
             "USDBRL=X": "Dólar Americano (USD/BRL)",
